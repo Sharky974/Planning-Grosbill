@@ -109,6 +109,7 @@ let S={
   hoursOpen:false,
   teamOpen:true,
   nextId:5,
+  configured:false,
   lastSaved:null,
   employees:[
     {id:1,name:'JANQUIN Marc',contract:35,soloOk:true,absent:true,restDays:[6],schedule:{}},
@@ -136,12 +137,13 @@ function applyState(d){
   if(Array.isArray(d.hours))S.hours=d.hours;
   if(Array.isArray(d.employees))S.employees=d.employees;
   if(d.nextId!=null)S.nextId=d.nextId;
+  if(d.configured!=null)S.configured=d.configured;
   if(d.savedAt)S.lastSaved=d.savedAt;
 }
-function snapshot(){ return {storeName:S.storeName,periodText:S.periodText,openDays:S.openDays,hours:S.hours,employees:S.employees,nextId:S.nextId,savedAt:Date.now()}; }
+function snapshot(){ return {storeName:S.storeName,periodText:S.periodText,openDays:S.openDays,hours:S.hours,employees:S.employees,nextId:S.nextId,configured:S.configured,savedAt:Date.now()}; }
 function load(){
   // Lecture synchrone du cache localStorage : affichage instantané
-  try{ const raw=localStorage.getItem(SAVE_KEY); if(raw)applyState(JSON.parse(raw)); }catch(e){}
+  try{ const raw=localStorage.getItem(SAVE_KEY); if(raw){ const d=JSON.parse(raw); applyState(d); if(d.configured==null)S.configured=true; } }catch(e){}
   try{ if(localStorage.getItem('grosbill-theme')==='dark')DARK=true; }catch(e){}
 }
 async function loadFromIDB(){
@@ -149,7 +151,7 @@ async function loadFromIDB(){
   try{
     const d=await IDB.get('planning');
     if(d){
-      if(!S.lastSaved || (d.savedAt||0)>=(S.lastSaved||0)){ applyState(d); render(); }
+      if(!S.lastSaved || (d.savedAt||0)>=(S.lastSaved||0)){ applyState(d); if(d.configured==null)S.configured=true; render(); }
     } else if(S.lastSaved){
       // Migration : on recopie les données localStorage existantes dans IndexedDB
       IDB.set('planning',snapshot());
@@ -258,6 +260,7 @@ function kpiCard(label,val,sub,bar,numColor){
 }
 
 function render(){
+  if(!S.configured){ renderSetup(); return; }
   const vm=computeVM();
   document.body.classList.toggle('gb-dark',DARK);
   const savedLabel=S.lastSaved?'Enregistré automatiquement à '+new Date(S.lastSaved).toLocaleTimeString('fr-FR'):'Enregistrement automatique activé';
@@ -302,7 +305,7 @@ function render(){
   h+='</div>';
   if(S.teamOpen){
   h+='<div style="overflow-x:auto;animation:gb-slidedown .3s cubic-bezier(.16,1,.3,1);"><table style="width:100%;border-collapse:collapse;min-width:760px;"><thead><tr style="text-align:left;font-size:10.5px;color:#8A9099;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">'+
-    '<th style="padding:9px 8px;">Employé</th><th style="padding:9px 8px;width:120px;">Contrat / sem.</th><th style="padding:9px 8px;">Jours de repos</th><th style="padding:9px 8px;width:130px;">Habilité seul</th><th style="padding:9px 8px;width:170px;"></th></tr></thead><tbody>';
+    '<th style="padding:9px 8px;">Employé</th><th style="padding:9px 8px;width:120px;">Contrat / sem.</th><th style="padding:9px 8px;">Jours de repos</th><th style="padding:9px 8px;width:140px;">Confirmé</th><th style="padding:9px 8px;width:170px;"></th></tr></thead><tbody>';
   vm.emps.forEach(emp=>{
     h+='<tr style="border-top:1px solid #EDEEF1;">';
     h+='<td style="padding:9px 8px;"><div style="display:flex;align-items:center;gap:8px;"><div style="display:flex;flex-direction:column;gap:2px;">'+
@@ -315,7 +318,7 @@ function render(){
       h+='<button data-act="rest" data-id="'+emp.id+'" data-di="'+di+'" style="background:'+(active?(DARK?'#D81E2C':'#1A1D21'):(DARK?'#26282e':'#fff'))+';color:'+(active?'#fff':(DARK?'#9aa0a8':'#A0A5AC'))+';border:1px solid '+(active?(DARK?'#D81E2C':'#1A1D21'):(DARK?'#3a3e45':'#E4E7EB'))+';border-radius:8px;padding:5px 8px;font-size:11.5px;font-weight:700;cursor:pointer;min-width:34px;">'+d.short+'</button>';
     });
     h+='</div></td>';
-    h+='<td style="padding:9px 8px;text-align:center;"><label style="display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;color:#5B616B;font-weight:600;"><input type="checkbox" data-act="solo" data-id="'+emp.id+'" '+(emp.soloOk?'checked':'')+' style="width:18px;height:18px;accent-color:#D81E2C;cursor:pointer;"/>Habilité</label></td>';
+    h+='<td style="padding:9px 8px;text-align:center;"><label style="display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;color:#5B616B;font-weight:600;"><input type="checkbox" data-act="solo" data-id="'+emp.id+'" '+(emp.soloOk?'checked':'')+' style="width:18px;height:18px;accent-color:#D81E2C;cursor:pointer;"/>Confirmé</label></td>';
     h+='<td style="padding:9px 8px;text-align:right;"><div style="display:inline-flex;flex-direction:column;gap:5px;align-items:stretch;min-width:150px;"><div style="display:flex;gap:5px;">'+
       '<button data-act="vac" data-id="'+emp.id+'" style="flex:1;background:'+emp.cpBg+';color:'+emp.cpColor+';border:1px solid '+emp.cpBorder+';border-radius:10px;padding:6px 8px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Congé</button>'+
       '<button data-act="abs" data-id="'+emp.id+'" style="flex:1;background:'+emp.absBg+';color:'+emp.absColor+';border:1px solid '+emp.absBorder+';border-radius:10px;padding:6px 8px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Absent</button></div>'+
@@ -507,8 +510,118 @@ function applyBackup(file){
   r.readAsText(file);
 }
 
-// EVENTS
+// ========== CONFIGURATION 1er LANCEMENT ==========
 const app=document.getElementById('app');
+const STORES=['Grosbill Paris 13e','Grosbill Paris 15e','Grosbill Paris 16e','Grosbill Montigny-lès-Cormeilles','Grosbill Sainte-Geneviève-des-Bois','Grosbill Plan de Campagne','Grosbill Roncq','Grosbill Villeneuve-d\'Ascq','Grosbill Lyon 3e','Grosbill Saint-Priest','Grosbill Rouen Barentin'];
+// État temporaire de l'assistant de configuration
+let SETUP={store:STORES[0],custom:'',emps:[{name:'',contract:35,soloOk:false},{name:'',contract:35,soloOk:false}],hours:DEFAULT_HOURS(),openDays:[false,true,true,true,true,true,true]};
+
+function renderSetup(){
+  const card='background:#fff;border:1px solid #E4E7EB;border-radius:14px;padding:22px 24px;margin-bottom:18px;';
+  const inp='width:100%;padding:9px 11px;border:1px solid #D7DBE0;border-radius:9px;font-size:14px;background:#fff;color:#16181D;';
+  const lbl='display:block;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#8A9099;margin-bottom:7px;';
+  let h='';
+  h+='<div style="max-width:760px;margin:0 auto;padding:30px 22px 60px;">';
+  h+='<div style="display:flex;align-items:center;gap:13px;margin-bottom:6px;"><img src="'+LOGO+'" alt="Grosbill" style="height:30px;"/></div>';
+  h+='<div class="gb-eyebrow" style="margin-bottom:2px;">Configuration initiale</div>';
+  h+='<h1 style="font-size:24px;font-weight:800;letter-spacing:-.6px;margin:0 0 4px;">Bienvenue</h1>';
+  h+='<p style="color:#6B7280;font-size:14px;margin:0 0 24px;">Quelques réglages avant de créer votre premier planning. Tout reste modifiable ensuite.</p>';
+
+  // 1. Magasin
+  h+='<div style="'+card+'">';
+  h+='<label style="'+lbl+'">1 · Nom du magasin</label>';
+  let opts='';
+  STORES.forEach(s=>{ opts+='<option value="'+esc(s)+'"'+(SETUP.store===s?' selected':'')+'>'+esc(s)+'</option>'; });
+  opts+='<option value="__custom"'+(SETUP.store==='__custom'?' selected':'')+'>Autre magasin…</option>';
+  h+='<select data-su="store" style="'+inp+'appearance:none;-webkit-appearance:none;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%238A9099%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>\');background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer;font-weight:700;">'+opts+'</select>';
+  if(SETUP.store==='__custom')h+='<input data-su="custom" value="'+esc(SETUP.custom)+'" placeholder="Nom du magasin" style="'+inp+'margin-top:9px;"/>';
+  h+='</div>';
+
+  // 2. Équipe
+  h+='<div style="'+card+'">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;"><label style="'+lbl+'margin:0;">2 · Qui travaille dans ce magasin</label></div>';
+  h+='<div style="display:flex;flex-direction:column;gap:9px;">';
+  SETUP.emps.forEach((e,i)=>{
+    h+='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">';
+    h+='<input data-su="ename" data-i="'+i+'" value="'+esc(e.name)+'" placeholder="Nom de l\'employé" style="'+inp+'flex:1;min-width:160px;"/>';
+    h+='<div style="display:flex;align-items:center;gap:5px;"><input data-su="econtract" data-i="'+i+'" type="number" min="0" step="1" value="'+e.contract+'" style="'+inp+'width:64px;text-align:center;padding:9px 6px;"/><span style="font-size:12px;color:#8A9099;font-weight:700;">h</span></div>';
+    h+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#16181D;cursor:pointer;white-space:nowrap;"><input data-su="esolo" data-i="'+i+'" type="checkbox" '+(e.soloOk?'checked':'')+' style="width:16px;height:16px;accent-color:#D81E2C;"/>Confirmé</label>';
+    h+='<button data-su="rmemp" data-i="'+i+'" title="Retirer" style="width:32px;height:32px;border:1px solid #E4E7EB;background:#fff;border-radius:8px;cursor:pointer;color:#8A9099;font-size:16px;line-height:1;flex:none;">×</button>';
+    h+='</div>';
+  });
+  h+='</div>';
+  h+='<button data-su="addemp" style="margin-top:11px;padding:8px 14px;border:1px dashed #C9CDD4;background:#fff;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;color:#16181D;">+ Ajouter un employé</button>';
+  h+='<p style="font-size:11.5px;color:#9AA0A8;margin:11px 0 0;">« Employé confirmé » = autorisé à travailler seul en magasin à l\'ouverture ou la fermeture.</p>';
+  h+='</div>';
+
+  // 3. Horaires
+  h+='<div style="'+card+'">';
+  h+='<label style="'+lbl+'">3 · Horaires du magasin</label>';
+  h+='<p style="font-size:11.5px;color:#9AA0A8;margin:0 0 13px;">Décochez les jours de fermeture. Coupure matin / après-midi = pause déjeuner.</p>';
+  h+='<div style="display:flex;flex-direction:column;gap:7px;">';
+  DAYS.forEach((d,di)=>{
+    const open=SETUP.openDays[di]; const hh=SETUP.hours[di]||{};
+    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid #F0F1F3;">';
+    h+='<label style="display:flex;align-items:center;gap:7px;width:120px;font-size:13px;font-weight:700;color:#16181D;cursor:pointer;"><input data-su="openday" data-di="'+di+'" type="checkbox" '+(open?'checked':'')+' style="width:16px;height:16px;accent-color:#D81E2C;"/>'+d.name+'</label>';
+    if(open){
+      const f=(field,ph)=>'<input data-su="hour" data-di="'+di+'" data-field="'+field+'" value="'+esc(hh[field]||'')+'" placeholder="'+ph+'" style="'+inp+'width:62px;text-align:center;padding:8px 4px;"/>';
+      h+='<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:12px;color:#8A9099;">';
+      h+=f('m1','10:00')+'<span>–</span>'+f('m2','12:30')+'<span style="margin:0 4px;color:#C9CDD4;">|</span>'+f('a1','14:00')+'<span>–</span>'+f('a2','19:00');
+      h+='</div>';
+    } else { h+='<span style="font-size:13px;color:#B0B5BC;font-style:italic;">Fermé</span>'; }
+    h+='</div>';
+  });
+  h+='</div></div>';
+
+  h+='<button data-su="finish" class="gb-action" style="width:100%;margin-top:6px;padding:14px;background:#D81E2C;color:#fff;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.2px;">Démarrer le planning</button>';
+  h+='</div>';
+  app.innerHTML=h;
+}
+
+function finishSetup(){
+  const name=SETUP.store==='__custom'?(SETUP.custom.trim()||'Mon magasin'):SETUP.store;
+  S.storeName=name;
+  S.openDays=SETUP.openDays.slice();
+  S.hours=SETUP.hours.map(h=>({...h}));
+  const emps=SETUP.emps.filter(e=>e.name.trim()).map(e=>({id:S.nextId++,name:e.name.trim(),contract:isNaN(parseFloat(e.contract))?35:parseFloat(e.contract),soloOk:!!e.soloOk,restDays:[6],schedule:{}}));
+  S.employees=emps;
+  S.configured=true;
+  S.teamOpen=true;
+  persist(); render();
+}
+
+// Gestion des interactions de l'assistant de configuration
+app && app.addEventListener('click',e=>{
+  const t=e.target.closest('[data-su]'); if(!t||S.configured)return;
+  const su=t.getAttribute('data-su');
+  const i=t.hasAttribute('data-i')?+t.getAttribute('data-i'):null;
+  if(t.tagName==='INPUT'&&su!=='openday'&&su!=='esolo')return;
+  switch(su){
+    case 'addemp': SETUP.emps.push({name:'',contract:35,soloOk:false}); renderSetup(); break;
+    case 'rmemp': SETUP.emps.splice(i,1); if(!SETUP.emps.length)SETUP.emps.push({name:'',contract:35,soloOk:false}); renderSetup(); break;
+    case 'esolo': SETUP.emps[i].soloOk=t.checked; break;
+    case 'openday': SETUP.openDays[i==null?+t.getAttribute('data-di'):i]=t.checked; renderSetup(); break;
+    case 'finish': finishSetup(); break;
+  }
+});
+app && app.addEventListener('change',e=>{
+  const t=e.target.closest('[data-su]'); if(!t||S.configured)return;
+  const su=t.getAttribute('data-su');
+  if(su==='store'){ SETUP.store=t.value; renderSetup(); }
+});
+app && app.addEventListener('input',e=>{
+  const t=e.target.closest('[data-su]'); if(!t||S.configured)return;
+  const su=t.getAttribute('data-su');
+  const i=t.hasAttribute('data-i')?+t.getAttribute('data-i'):null;
+  switch(su){
+    case 'custom': SETUP.custom=t.value; break;
+    case 'ename': SETUP.emps[i].name=t.value; break;
+    case 'econtract': SETUP.emps[i].contract=t.value; break;
+    case 'hour': { const di=+t.getAttribute('data-di'),field=t.getAttribute('data-field'); SETUP.hours[di]={...SETUP.hours[di],[field]:t.value}; break; }
+  }
+});
+
+// EVENTS
 app.addEventListener('click',e=>{
   const t=e.target.closest('[data-act]'); if(!t)return;
   const act=t.getAttribute('data-act');

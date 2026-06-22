@@ -445,7 +445,7 @@ function buildDoorSignHTML(){
   } else {
     pagesHTML=groups.map(g=>{
       const label=g.start===g.end?upper[g.start]:'DU '+upper[g.start]+' AU '+upper[g.end];
-      const lines='<div class="hours">'+g.segs.map(line).map(t=>'<div class="hr">'+t+'</div>').join('<span class="sep"></span>')+'</div>';
+      const lines='<div class="hours">'+g.segs.map(line).map(t=>'<div class="hr">'+t+'</div>').join('')+'</div>';
       return page(label,lines);
     }).join('');
   }
@@ -466,9 +466,8 @@ function buildDoorSignHTML(){
   '.rule{width:78mm;height:3px;background:#16181D;margin:7mm 0;position:relative;}'+
   '.days{font-size:46pt;font-weight:800;letter-spacing:.5px;color:#16181D;text-transform:uppercase;line-height:1.05;white-space:nowrap;margin-bottom:6mm;position:relative;}'+
   '.dbar{width:48mm;height:5px;border-radius:3px;background:#D81E2C;margin-bottom:12mm;position:relative;}'+
-  '.hours{display:flex;align-items:center;justify-content:center;gap:16mm;flex-wrap:wrap;position:relative;}'+
-  '.hours .hr{font-family:"Space Grotesk",Manrope,sans-serif;font-size:30pt;font-weight:600;color:#2A2E34;line-height:1.4;white-space:nowrap;}'+
-  '.sep{width:12px;height:12px;border-radius:50%;background:#D81E2C;flex:none;}'+
+  '.hours{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8mm;position:relative;}'+
+  '.hours .hr{font-family:"Space Grotesk",Manrope,sans-serif;font-size:32pt;font-weight:600;color:#2A2E34;line-height:1.3;white-space:nowrap;}'+
   '.store{position:absolute;bottom:18mm;left:0;right:0;font-size:13pt;font-weight:700;color:#9097A0;letter-spacing:.3px;}'+
   '</style></head><body>'+
   '<div class="bar"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div>'+

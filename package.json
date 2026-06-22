@@ -1,8 +1,8 @@
 {
   "name": "planning-grosbill",
   "productName": "Planning Grosbill",
-  "version": "1.0.0",
-  "description": "Application de planning autonome Grosbill",
+  "version": "1.1.0",
+  "description": "Logiciel de gestion planning",
   "main": "main.js",
   "author": "Amaury Ollivier",
   "scripts": {

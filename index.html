@@ -11,7 +11,6 @@
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Manrope',-apple-system,system-ui,sans-serif;background:#EDEEF1;color:#16181D;-webkit-font-smoothing:antialiased;}
   input,button,select{font-family:inherit;}
-  input[type="time"]{appearance:none;}
   ::-webkit-scrollbar{height:10px;width:10px;}
   ::-webkit-scrollbar-thumb{background:#CFD3D8;border-radius:8px;}
   .gb-num{font-family:'Space Grotesk','Manrope',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
@@ -338,13 +337,13 @@ function render(){
       h+='<div class="gb-hr" style="display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid #EDEEF1;opacity:'+d.rowOpacity+';flex-wrap:wrap;">';
       h+='<label style="display:flex;align-items:center;gap:8px;width:138px;font-weight:700;font-size:13px;cursor:pointer;flex:none;"><input type="checkbox" data-act="openday" data-di="'+d.di+'" '+(d.open?'checked':'')+' style="width:16px;height:16px;accent-color:#D81E2C;cursor:pointer;"/>'+d.full+'</label>';
       h+='<span style="font-size:10px;color:#8A9099;font-weight:800;text-transform:uppercase;letter-spacing:.5px;width:50px;flex:none;">Matin</span>';
-      h+='<input type="time" step="300" data-act="hour" data-di="'+d.di+'" data-field="m1" value="'+(d.m1||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;"/>';
+      h+='<input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-act="hour" data-di="'+d.di+'" data-field="m1" value="'+(d.m1||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;text-align:center;"/>';
       h+='<span style="color:#A0A5AC;">–</span>';
-      h+='<input type="time" step="300" data-act="hour" data-di="'+d.di+'" data-field="m2" value="'+(d.m2||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;"/>';
+      h+='<input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-act="hour" data-di="'+d.di+'" data-field="m2" value="'+(d.m2||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;text-align:center;"/>';
       h+='<span style="font-size:10px;color:#8A9099;font-weight:800;text-transform:uppercase;letter-spacing:.5px;width:72px;flex:none;margin-left:8px;">Après-midi</span>';
-      h+='<input type="time" step="300" data-act="hour" data-di="'+d.di+'" data-field="a1" value="'+(d.a1||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;"/>';
+      h+='<input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-act="hour" data-di="'+d.di+'" data-field="a1" value="'+(d.a1||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;text-align:center;"/>';
       h+='<span style="color:#A0A5AC;">–</span>';
-      h+='<input type="time" step="300" data-act="hour" data-di="'+d.di+'" data-field="a2" value="'+(d.a2||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;"/>';
+      h+='<input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-act="hour" data-di="'+d.di+'" data-field="a2" value="'+(d.a2||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:5px 6px;font-size:12.5px;font-weight:600;width:90px;color:#1A1D21;text-align:center;"/>';
       h+='</div>';
     });
     h+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid #EDEEF1;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
@@ -376,9 +375,9 @@ function render(){
       else {
         cell.shifts.forEach((sh,si)=>{
           h+='<div style="display:flex;align-items:center;gap:2px;margin-bottom:4px;">'+
-            '<input type="time" step="300" data-act="shift" data-id="'+emp.id+'" data-di="'+cell.di+'" data-si="'+si+'" data-field="start" value="'+(sh.start||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:3px 3px;font-size:11.5px;font-weight:600;width:72px;color:#1A1D21;"/>'+
+            '<input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-act="shift" data-id="'+emp.id+'" data-di="'+cell.di+'" data-si="'+si+'" data-field="start" value="'+(sh.start||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:3px 3px;font-size:11.5px;font-weight:600;width:54px;color:#1A1D21;text-align:center;"/>'+
             '<span style="color:#A0A5AC;font-size:11px;">–</span>'+
-            '<input type="time" step="300" data-act="shift" data-id="'+emp.id+'" data-di="'+cell.di+'" data-si="'+si+'" data-field="end" value="'+(sh.end||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:3px 3px;font-size:11.5px;font-weight:600;width:72px;color:#1A1D21;"/>'+
+            '<input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-act="shift" data-id="'+emp.id+'" data-di="'+cell.di+'" data-si="'+si+'" data-field="end" value="'+(sh.end||'')+'" style="border:1px solid #E4E7EB;border-radius:8px;padding:3px 3px;font-size:11.5px;font-weight:600;width:54px;color:#1A1D21;text-align:center;"/>'+
             '<button data-act="rmShift" data-id="'+emp.id+'" data-di="'+cell.di+'" data-si="'+si+'" style="background:transparent;border:none;color:#C2C6CC;font-size:15px;cursor:pointer;line-height:1;padding:0 2px;">×</button></div>';
         });
         h+='<button class="gb-dash" data-act="addShift" data-id="'+emp.id+'" data-di="'+cell.di+'" style="background:transparent;border:1px dashed #D2D6DB;color:#8A9099;border-radius:8px;padding:3px 7px;font-size:11px;font-weight:700;cursor:pointer;width:100%;margin-top:1px;">+ créneau</button>';
@@ -550,10 +549,33 @@ app.addEventListener('change',e=>{
     case 'contract': { const emp=empById(id); const n=parseFloat(t.value); emp.contract=isNaN(n)?0:n; commit(); break; }
     case 'solo': { const emp=empById(id); emp.soloOk=t.checked; commit(); break; }
     case 'openday': S.openDays=S.openDays.map((o,i)=>i===di?t.checked:o); commit(); break;
-    case 'hour': S.hours=(S.hours||DEFAULT_HOURS()).map((hh,i)=>i===di?{...hh,[field]:t.value}:hh); commit(); break;
-    case 'shift': { const emp=empById(id); emp.schedule[di]=(emp.schedule[di]||[]).map((x,k)=>k===si?{...x,[field]:t.value}:x); commit(); break; }
+    case 'hour': { const v=normTime(t.value); t.value=v; S.hours=(S.hours||DEFAULT_HOURS()).map((hh,i)=>i===di?{...hh,[field]:v}:hh); commit(); break; }
+    case 'shift': { const v=normTime(t.value); t.value=v; const emp=empById(id); emp.schedule[di]=(emp.schedule[di]||[]).map((x,k)=>k===si?{...x,[field]:v}:x); commit(); break; }
   }
 });
+// Normalise une saisie d'heure libre vers "HH:MM" (accepte 14, 1400, 14h, 14:0, 9:5, etc.)
+function normTime(raw){
+  if(raw==null)return '';
+  let s=String(raw).trim().toLowerCase().replace('h',':');
+  if(s==='')return '';
+  const digits=s.replace(/[^0-9]/g,'');
+  let hh, mm;
+  if(s.includes(':')){
+    const p=s.split(':');
+    hh=parseInt(p[0],10); mm=parseInt(p[1],10);
+    if(isNaN(mm))mm=0;
+  } else if(digits.length<=2){
+    hh=parseInt(digits,10); mm=0;
+  } else if(digits.length===3){
+    hh=parseInt(digits.slice(0,1),10); mm=parseInt(digits.slice(1),10);
+  } else {
+    hh=parseInt(digits.slice(0,2),10); mm=parseInt(digits.slice(2,4),10);
+  }
+  if(isNaN(hh))return '';
+  if(hh>23)hh=23; if(hh<0)hh=0;
+  if(isNaN(mm)||mm<0)mm=0; if(mm>59)mm=59;
+  return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
 
 load();
 render();

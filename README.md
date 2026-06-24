@@ -105,10 +105,9 @@ Ce logiciel n'est **pas** développé par le groupe Cybertek. Il s'agit d'un out
 
 ### v1.3.0
 
-- **Alertes de conformité du volume horaire** : détection automatique des employés en **dépassement** ou en **déficit** par rapport à leur contrat hebdomadaire, ainsi que des employés **sans aucune heure planifiée**. Les écarts sont gradués — orange « à ajuster » (jusqu'à 2 h), rouge « hors contrat » (au-delà de 2 h).
-- **Démarrage épuré** : suppression des employés d'exemple présents dans le code ; l'application s'ouvre désormais directement sur l'assistant de configuration.
-- **Nettoyage du code** : retrait de fonctions de sauvegarde / restauration JSON qui n'étaient reliées à aucune action, et correction du libellé du bouton de réinitialisation.
-- **Publication GitHub** : workflow de build mis à jour pour générer automatiquement une *Release* avec l'`.exe` lors d'un tag de version.
+- **Alertes de conformité du volume horaire** : détection automatique des employés en **dépassement** ou en **déficit** par rapport à leur contrat hebdomadaire, ainsi que des employés **sans aucune heure planifiée**. Les écarts sont gradués — orange « à ajuster » (jusqu'à 2 h), rouge « hors contrat » (au-delà de 2 h)
+- **Nettoyage du code** : retrait de fonctions de sauvegarde / restauration JSON qui n'étaient reliées à aucune action, et correction du libellé du bouton de réinitialisation
+- **Bug Fix** : Correction de plusieurs bug rencontré lors de l'utilisation.
 
 ### v1.2.0
 

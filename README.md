@@ -1,14 +1,14 @@
-# Planning Grosbill
+# BIBINE
 
 Application de gestion de planning hebdomadaire pour magasin, en version Windows autonome (`.exe` portable, sans installation). Toutes les données restent en local sur le poste.
 
-**Version actuelle : v2.0.1**
+**Version actuelle : v2.1.0**
 
 ---
 
 ## Présentation
 
-Planning Grosbill permet de construire le planning hebdomadaire de l'équipe d'un magasin, de vérifier automatiquement sa conformité (contrats, couverture, habilitations) et de produire des documents prêts à imprimer (planning et affiche horaires).
+BIBINE permet de construire le planning hebdomadaire de l'équipe d'un magasin, de vérifier automatiquement sa conformité (contrats, couverture, habilitations) et de produire des documents prêts à imprimer (planning et affiche horaires). L'enseigne (Grosbill ou Cybertek) se choisit à l'intérieur de l'application.
 
 Depuis la version **1.2.0**, l'application intègre un assistant de configuration au premier lancement afin de préparer rapidement le planning selon le magasin, l'équipe et les horaires d'ouverture.
 
@@ -91,7 +91,7 @@ Les alertes sont graduées sur trois niveaux :
 
 ## Installation
 
-Aucune installation requise. Téléchargez `Planning-Grosbill-portable.exe` et lancez-le directement. Les données sont conservées entre les lancements.
+Aucune installation requise. Téléchargez `BIBINE-portable.exe` et lancez-le directement. Les données sont conservées entre les lancements.
 
 > Au premier lancement, Windows peut afficher un avertissement SmartScreen (éditeur inconnu) : cliquer sur **Informations complémentaires** puis **Exécuter quand même**.
 
@@ -104,6 +104,12 @@ Ce logiciel n'est **pas** développé par le groupe Cybertek. Il s'agit d'un out
 ---
 
 ## Changelog
+
+### v2.1.0
+
+- **Nouveau nom : BIBINE**. L'application est renommée « Planning Grosbill » → **BIBINE**, partout : titre de la fenêtre, icône d'application, README, workflow de build et nom de l'exécutable portable (`BIBINE-portable.exe`). Les enseignes **Grosbill** et **Cybertek** restent sélectionnables à l'intérieur de l'application (logo, couleur d'accent et liste de magasins).
+- **Nouveau logo d'application** : icône dédiée (calendrier + bouteille + circuit + validation), utilisée comme favicon.
+- **Petite touche** sur l'écran de configuration.
 
 ### v2.0.1
 

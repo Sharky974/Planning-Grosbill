@@ -2,7 +2,7 @@
   "name": "bibine",
   "productName": "Bibine - Planning Manager",
   "version": "2.1.0",
-  "description": "Bibine - Planning Manager — Logiciel de gestion planning Cybertek et Grosbill",
+  "description": "Bibine - Planning Manager — Logiciel de gestion planning",
   "main": "main.js",
   "author": "Amaury Ollivier",
   "scripts": {
@@ -28,7 +28,7 @@
       "icon": "build/icon.ico"
     },
     "portable": {
-      "artifactName": "BIBINE.exe"
+      "artifactName": "BIBINE-portable.exe"
     }
   }
 }

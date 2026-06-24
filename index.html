@@ -98,25 +98,17 @@ function cellErr(raw,segs){ const sh=raw.map(s=>({s:toMin(s.start),e:toMin(s.end
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const SAVE_KEY='grosbill-planning-v3';
 
-const K=()=>[{start:'10:00',end:'11:30'},{start:'13:30',end:'19:00'}];
-const H=()=>[{start:'10:00',end:'12:30'},{start:'14:30',end:'19:00'}];
-
 let S={
-  storeName:'Grosbill Sainte Geneviève des Bois',
-  periodText:'du 16 au 22 juin 2026',
+  storeName:'',
+  periodText:'',
   openDays:[false,true,true,true,true,true,true],
   hours:DEFAULT_HOURS(),
   hoursOpen:false,
   teamOpen:true,
-  nextId:5,
+  nextId:1,
   configured:false,
   lastSaved:null,
-  employees:[
-    {id:1,name:'JANQUIN Marc',contract:35,soloOk:true,absent:true,restDays:[6],schedule:{}},
-    {id:2,name:'OLLIVIER AMAURY',contract:35,soloOk:true,vacation:true,restDays:[6],schedule:{}},
-    {id:4,name:'MOINDRON HERVE',contract:35,soloOk:true,restDays:[0,4],schedule:{1:H(),2:H(),3:H(),5:H(),6:H()}},
-    {id:3,name:'KILLYANN',contract:35,soloOk:false,restDays:[0,6],schedule:{1:K(),2:K(),3:K(),4:K(),5:K()}}
-  ]
+  employees:[]
 };
 let DARK=false;
 
@@ -203,7 +195,6 @@ function computeVM(){
     mergeIv(alone).forEach(iv=>alerts.push({lvl:'block',text:d.name+' : '+aname+' seul(e) en magasin '+fmtClock(iv[0])+'–'+fmtClock(iv[1])+' sans habilitation'}));
   });
   const blockingCount=alerts.filter(a=>a.lvl==='block').length;
-  alerts.sort((a,b)=>(a.lvl==='block'?0:1)-(b.lvl==='block'?0:1));
 
   let grandTotalMin=0,conformCount=0,activeCount=0,awayCount=0;
   const emps=employees.map(emp=>{
@@ -218,7 +209,17 @@ function computeVM(){
     const st=ad<=TOL?'green':ad<=120?'orange':'red';
     const sc={green:{bg:'#E7F5EC',c:'#1E8E3E',b:'#B6E0C4'},orange:{bg:'#FDF2E3',c:'#B5670B',b:'#F2D8A8'},red:{bg:'#FDECEC',c:'#B71722',b:'#F1B9B9'}}[st];
     const diffLabel=diff===0?'OK':(diff>0?'+':'')+fmtDur(diff);
-    if(vac){awayCount++;}else{activeCount++;grandTotalMin+=total;if(st==='green')conformCount++;}
+    if(vac){awayCount++;}else{activeCount++;grandTotalMin+=total;if(st==='green')conformCount++;
+      // Volume d'heures vs contrat : écart léger (≤2h) = orange « à ajuster » ; écart important (>2h) = rouge « hors contrat »
+      if(st!=='green'){
+        const lvl=st==='red'?'hard':'err';
+        let txt;
+        if(total===0) txt=(emp.name||'Sans nom')+' : aucune heure planifiée (contrat '+fmtDur(contractMin)+')';
+        else if(diff>0) txt=(emp.name||'Sans nom')+' : '+fmtDur(total)+' planifiées, soit '+fmtDur(diff)+' de plus que le contrat ('+fmtDur(contractMin)+')';
+        else txt=(emp.name||'Sans nom')+' : '+fmtDur(total)+' planifiées, soit '+fmtDur(-diff)+' de moins que le contrat ('+fmtDur(contractMin)+')';
+        alerts.push({lvl,text:txt});
+      }
+    }
     const cells=DAYS.map((d,di)=>{
       const open=openDays[di], rest=emp.restDays.includes(di), raw=emp.schedule[di]||[];
       const err=!vac&&open&&!rest&&cellErr(raw,segsByDay[di]);
@@ -232,6 +233,9 @@ function computeVM(){
       statusBg:vac?(cp?'#FDF2E3':'#FDECEC'):sc.bg, statusColor:vac?awayColor:sc.c, statusBorder:vac?awayBorder:sc.b,
       cells};
   });
+  // Tri : bloquantes d'abord, puis hors contrat (rouge), puis écarts à ajuster (orange)
+  const lvlRank={block:0,hard:1,err:2};
+  alerts.sort((a,b)=>(lvlRank[a.lvl]==null?3:lvlRank[a.lvl])-(lvlRank[b.lvl]==null?3:lvlRank[b.lvl]));
   const days=DAYS.map((d,di)=>{const h=hours[di]||{};return {short:d.short,full:d.name,open:openDays[di],di,
     headBg:openDays[di]?(DARK?'#16181c':'#fff'):(DARK?'#16181c':'#F0F1F3'),headColor:openDays[di]?(DARK?'#EDEEF0':'#1A1D21'):'#A0A5AC',
     hoursLabel:openDays[di]?hoursLabel(h):'Fermé', m1:h.m1,m2:h.m2,a1:h.a1,a2:h.a2, rowOpacity:openDays[di]?'1':'0.55'};});
@@ -247,7 +251,7 @@ function computeVM(){
     alertBar:(blockingCount>0?'#D81E2C':(alerts.length?'#E8830C':'#2BB673')),
     alertColor:(blockingCount>0?'#D81E2C':(alerts.length?'#B5670B':'#16181D'))
   };
-  const alertVm=alerts.map(a=>({text:a.text, blocking:a.lvl==='block', bg:a.lvl==='block'?'#FDECEC':'#FFF7ED', border:a.lvl==='block'?'#F1B9B9':'#FBD9AE', dot:a.lvl==='block'?'#D81E2C':'#E8830C'}));
+  const alertVm=alerts.map(a=>{const red=a.lvl==='block'||a.lvl==='hard';return {text:a.text, blocking:a.lvl==='block', bg:red?'#FDECEC':'#FFF7ED', border:red?'#F1B9B9':'#FBD9AE', dot:red?'#D81E2C':'#E8830C'};});
   return {emps,days,kpis,alerts:alertVm,blockingCount};
 }
 
@@ -477,39 +481,6 @@ function buildDoorSignHTML(){
   pagesHTML+'</body></html>';
 }
 
-function downloadBackup(){
-  try{
-    persist();
-    const data={storeName:S.storeName,periodText:S.periodText,openDays:S.openDays,hours:S.hours,employees:S.employees,nextId:S.nextId,savedAt:Date.now(),_app:'grosbill-planning',_v:3};
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    const safe=(S.storeName||'planning').replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'').toLowerCase()||'magasin';
-    a.href=url; a.download='planning-'+safe+'.json';
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ try{document.body.removeChild(a);}catch(e){} URL.revokeObjectURL(url); },120);
-  }catch(e){ alert('Impossible d\u2019enregistrer le fichier : '+e.message); }
-}
-function applyBackup(file){
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result);
-      if(d._app&&d._app!=='grosbill-planning'){ if(!confirm('Ce fichier ne semble pas \u00eatre un planning Grosbill. Le charger quand m\u00eame ?'))return; }
-      if(d.storeName!=null)S.storeName=d.storeName;
-      if(d.periodText!=null)S.periodText=d.periodText;
-      if(Array.isArray(d.openDays))S.openDays=d.openDays;
-      if(Array.isArray(d.hours))S.hours=d.hours;
-      if(Array.isArray(d.employees))S.employees=d.employees;
-      if(d.nextId!=null)S.nextId=d.nextId;
-      persist(); render();
-      alert('Planning charg\u00e9 avec succ\u00e8s.');
-    }catch(e){ alert('Fichier invalide ou illisible : '+e.message); }
-  };
-  r.onerror=()=>alert('Impossible de lire le fichier.');
-  r.readAsText(file);
-}
-
 // ========== CONFIGURATION 1er LANCEMENT ==========
 const app=document.getElementById('app');
 const STORES=['Grosbill Paris 13e','Grosbill Paris 15e','Grosbill Paris 16e','Grosbill Montigny-lès-Cormeilles','Grosbill Sainte-Geneviève-des-Bois','Grosbill Plan de Campagne','Grosbill Roncq','Grosbill Villeneuve-d\'Ascq','Grosbill Lyon 3e','Grosbill Saint-Priest','Grosbill Rouen Barentin'];
@@ -642,7 +613,7 @@ app.addEventListener('click',e=>{
     case 'doorsign': { const w=window.open('','_blank'); if(!w){alert('Veuillez autoriser les fenêtres pop-up pour ouvrir l\'affiche dans un nouvel onglet.');return;} w.document.open(); w.document.write(buildDoorSignHTML()); w.document.close(); break; }
     case 'toggleTeam': S.teamOpen=!S.teamOpen; render(); break;
     case 'toggleHours': S.hoursOpen=!S.hoursOpen; render(); break;
-    case 'reset': if(confirm('Effacer le planning enregistré et revenir à l\'exemple de départ ?')){ try{localStorage.removeItem(SAVE_KEY);}catch(e){} try{IDB.del('planning');}catch(e){} location.reload(); } break;
+    case 'reset': if(confirm('Effacer le planning enregistré et relancer la configuration ?')){ try{localStorage.removeItem(SAVE_KEY);}catch(e){} try{IDB.del('planning');}catch(e){} location.reload(); } break;
     case 'dark': DARK=!DARK; try{localStorage.setItem('grosbill-theme',DARK?'dark':'light');}catch(e){} render(); break;
     case 'export': { const w=window.open('','_blank'); if(!w){alert('Veuillez autoriser les fenêtres pop-up pour ouvrir le PDF dans un nouvel onglet.');return;} w.document.open(); w.document.write(buildExportHTML()); w.document.close(); break; }
   }
@@ -695,6 +666,25 @@ render();
 try{ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist(); }catch(e){}
 // Recharge la version durable depuis IndexedDB (asynchrone) puis redessine si besoin
 loadFromIDB();
+
+// — petit clin d'oeil de l'equipe : 5 clics sur le logo Grosbill —
+(function(){
+  let n=0, timer=null;
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('img[alt="Grosbill"]'))return;
+    n++; clearTimeout(timer); timer=setTimeout(function(){n=0;},1400);
+    if(n>=5){ n=0; showTeamSignature(); }
+  });
+  function showTeamSignature(){
+    var old=document.getElementById('gb-egg'); if(old)old.remove();
+    var t=document.createElement('div'); t.id='gb-egg';
+    t.innerHTML='Code\u0301 avec <span style="color:#FF6B74;">\u2665</span> et Claude par l\u2019e\u0301quipe du meilleur magasin<br><strong style="font-weight:800;">Grosbill Sainte-Genevie\u0300ve-des-Bois</strong> \u2014 Marc \u00b7 Amaury \u00b7 Herve\u0301';
+    t.style.cssText='position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(14px);background:#16181D;color:#fff;padding:15px 22px;border-radius:14px;font-family:Manrope,system-ui,sans-serif;font-size:13.5px;font-weight:600;line-height:1.5;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);z-index:9999;opacity:0;transition:opacity .45s ease,transform .45s cubic-bezier(.16,1,.3,1);max-width:90vw;';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
+    setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(14px)'; setTimeout(function(){ if(t.parentNode)t.remove(); },500); },5000);
+  }
+})();
 </script>
 </body>
 </html>

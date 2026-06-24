@@ -2,7 +2,7 @@
 
 Application de gestion de planning hebdomadaire pour magasin, en version Windows autonome (`.exe` portable, sans installation). Toutes les données restent en local sur le poste.
 
-**Version actuelle : v1.2.0**
+**Version actuelle : v1.3.0**
 
 ---
 
@@ -58,9 +58,14 @@ Détectés et signalés en temps réel :
 - créneaux hors des horaires d'ouverture du magasin ;
 - chevauchements de créneaux pour un même employé ;
 - trous de couverture : créneaux où personne n'est présent en magasin ;
+- **volume horaire non conforme au contrat** : un employé qui dépasse ou n'atteint pas son contrat hebdomadaire est signalé, de même qu'un employé sans aucune heure planifiée ;
 - travail en solo non confirmé : un employé seul à l'ouverture ou à la fermeture sans statut **Employé confirmé**.
 
-Les alertes bloquantes sont distinguées des simples avertissements.
+Les alertes sont graduées sur trois niveaux :
+
+- **Avertissement** (orange) — écart à ajuster, jusqu'à 2 h de différence avec le contrat ;
+- **Hors contrat / incohérence** (rouge) — écart de plus de 2 h, ou aucune heure planifiée ;
+- **Bloquant** — personne seule non habilitée en magasin.
 
 ### Horaires d'ouverture du magasin
 
@@ -97,6 +102,13 @@ Ce logiciel n'est **pas** développé par le groupe Cybertek. Il s'agit d'un out
 ---
 
 ## Changelog
+
+### v1.3.0
+
+- **Alertes de conformité du volume horaire** : détection automatique des employés en **dépassement** ou en **déficit** par rapport à leur contrat hebdomadaire, ainsi que des employés **sans aucune heure planifiée**. Les écarts sont gradués — orange « à ajuster » (jusqu'à 2 h), rouge « hors contrat » (au-delà de 2 h).
+- **Démarrage épuré** : suppression des employés d'exemple présents dans le code ; l'application s'ouvre désormais directement sur l'assistant de configuration.
+- **Nettoyage du code** : retrait de fonctions de sauvegarde / restauration JSON qui n'étaient reliées à aucune action, et correction du libellé du bouton de réinitialisation.
+- **Publication GitHub** : workflow de build mis à jour pour générer automatiquement une *Release* avec l'`.exe` lors d'un tag de version.
 
 ### v1.2.0
 

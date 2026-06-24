@@ -30,7 +30,7 @@ jobs:
       - name: Upload exe (artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: Planning-Grosbill-portable
+          name: BIBINE-portable
           path: release/*.exe
 
       - name: Publish GitHub Release

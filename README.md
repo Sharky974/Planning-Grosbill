@@ -109,7 +109,7 @@ Ce logiciel n'est **pas** développé par le groupe Cybertek. Il s'agit d'un out
 
 - **Nouveau nom : Bibine - Planning Manager** (anciennement « Planning Grosbill »). Le renommage est appliqué partout : titre de la fenêtre, icône d'application, `README`, workflow de build, `package.json` (`name`, `productName`, `appId`) et nom de l'exécutable portable (`BIBINE-portable.exe`). Les enseignes **Grosbill** et **Cybertek** restent sélectionnables à l'intérieur de l'application (logo, couleur d'accent et liste de magasins) — ce sont des marques internes, distinctes du nom de l'application.
 - **Nouveau logo d'application** : icône dédiée, utilisée comme favicon de l'application et comme icône de l'exécutable Windows (`build/icon.ico`, multi-tailles 16→256 px).
-- **`package.json` remis à jour** : version `1.2.0` → `2.1.0`, `productName` = **Bibine - Planning Manager**, `appId` = `com.bibine.app`, `artifactName` = `BIBINE-portable.exe`.
+- **`package.json` remis à jour** : version `1.2.0` → `2.1.3`, `productName` = **Bibine - Planning Manager**, `appId` = `com.bibine.app`, `artifactName` = `BIBINE-portable.exe`.
 - **Workflow GitHub (`build.yml`)** : artifact renommé `Planning-Grosbill-portable` → `BIBINE-portable`.
 
 ### v2.0.1

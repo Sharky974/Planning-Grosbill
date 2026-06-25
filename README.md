@@ -78,7 +78,7 @@ Les alertes sont graduées sur trois niveaux :
 ### Exports / impression
 
 - Export du planning en **PDF**, prêt à imprimer.
-- **Affiche horaires** A4 paysage, avec logo Grosbill, prête à afficher en vitrine ou sur la porte. Regroupement automatique des jours ayant les mêmes horaires (ex. « DU MARDI AU SAMEDI »).
+- **Affiche horaires** A4 paysage, avec logo Grosbill/Cybertek, prête à afficher en vitrine ou sur la porte. Regroupement automatique des jours ayant les mêmes horaires (ex. « DU MARDI AU SAMEDI »).
 
 ### Confort d'usage
 

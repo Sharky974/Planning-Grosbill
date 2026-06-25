@@ -1,7 +1,7 @@
 {
   "name": "bibine",
   "productName": "Bibine - Planning Manager",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Bibine - Planning Manager — Logiciel de gestion planning",
   "main": "main.js",
   "author": "Amaury Ollivier",
